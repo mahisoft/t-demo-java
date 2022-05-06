@@ -1,0 +1,32 @@
+plugins {
+    id 'application'
+    id 'java'
+}
+
+apply plugin: "java"
+
+group 'com.mahisoft.poc'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.temporal:temporal-sdk:1.11.0'
+    implementation "org.slf4j:slf4j-api:1.7.36"
+    implementation "org.slf4j:slf4j-simple:1.7.36"
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testImplementation group: 'io.temporal', name: 'temporal-testing', version: '1.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    mainClassName = "com.mahisoft.poc.Worker"
+}
