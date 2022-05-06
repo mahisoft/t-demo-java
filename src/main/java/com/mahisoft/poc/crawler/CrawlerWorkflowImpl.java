@@ -32,6 +32,7 @@ public class CrawlerWorkflowImpl implements CrawlerWorkflow {
 
     @Override
     public void crawl(State state) {
+        log.info("starting crawler");
         current = state;
 
         var page = query.getNextPage(new Query(current.getPage(), current.getSize()));
@@ -53,6 +54,7 @@ public class CrawlerWorkflowImpl implements CrawlerWorkflow {
 
     @Override
     public void changePageSize(int size) {
+        log.info("changing page size to {}", size);
         current.setSize(size);
     }
 

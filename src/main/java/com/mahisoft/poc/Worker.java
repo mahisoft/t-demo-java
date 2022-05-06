@@ -20,7 +20,7 @@ public class Worker {
 
     public static void main(String[] args) {
         try {
-            logger.info("Worker starting");
+            logger.info(String.format("Worker starting: PID %d", ProcessHandle.current().pid()));
             var worker = factory.newWorker(QUEUE_NAME);
             worker.registerWorkflowImplementationTypes(CrawlerWorkflowImpl.class);
             worker.registerActivitiesImplementations(new QueryActivityImpl(), new RecordActivityImpl());
