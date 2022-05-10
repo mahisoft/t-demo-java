@@ -1,4 +1,4 @@
-package com.mahisoft.poc.activities;
+package com.mahisoft.poc.crawler.activities;
 
 import java.util.List;
 

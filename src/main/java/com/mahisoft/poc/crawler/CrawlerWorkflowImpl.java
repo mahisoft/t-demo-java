@@ -1,9 +1,9 @@
 package com.mahisoft.poc.crawler;
 
-import com.mahisoft.poc.activities.Item;
-import com.mahisoft.poc.activities.Query;
-import com.mahisoft.poc.activities.QueryActivity;
-import com.mahisoft.poc.activities.RecordActivity;
+import com.mahisoft.poc.crawler.activities.Item;
+import com.mahisoft.poc.crawler.activities.Query;
+import com.mahisoft.poc.crawler.activities.QueryActivity;
+import com.mahisoft.poc.crawler.activities.RecordActivity;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.client.ActivityCompletionException;
 import io.temporal.workflow.Async;
