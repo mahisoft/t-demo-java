@@ -39,13 +39,19 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
     private final InspectionActivity inspection = Workflow.newActivityStub(InspectionActivity.class, defaultOptions);
     private final SignatureActivity signature = Workflow.newActivityStub(SignatureActivity.class, defaultOptions);
 
-
-    private final Integer inspectionExpirationDays = 60;
+    // We might want to set this value from configuration, or perhaps load it from
+    // an external service
+    private Integer inspectionExpirationDays = 60;
 
 
     @Override
     public void publish(PublicationState state) {
         this.current = state;
+
+        // This hack ensures that if the inspectionExpirationDays value is changed, either in the code
+        // or by the configuration, it won't produce a non-deterministic error when the rule is evaluated below.
+        inspectionExpirationDays = Workflow.sideEffect(Integer.class, () -> inspectionExpirationDays);
+
         asset = assets.getAsset(state.getAssetId());
 
         var promises = List.of(
