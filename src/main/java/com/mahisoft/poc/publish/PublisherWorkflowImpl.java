@@ -16,11 +16,11 @@ import org.slf4j.Logger;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class PublisherWorkflowImpl implements PublisherWorkflow {
-
 
     private final Logger log = Workflow.getLogger(CrawlerWorkflowImpl.class);
 
@@ -72,16 +72,28 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
 
     @Override
     public void updateMedia(MediaStatus status) {
+        if (current == null || !MediaStatus.REQUESTED.equals(current.getMediaStatus())) {
+            return;
+        }
+
         current.setMediaStatus(status);
     }
 
     @Override
     public void updateInspection(InspectionStatus status) {
+        if (current == null || !InspectionStatus.REQUESTED.equals(current.getInspectionStatus())) {
+            return;
+        }
+
         current.setInspectionStatus(status);
     }
 
     @Override
     public void updateSalesAgreement(SignatureStatus status) {
+        if (current == null || !SignatureStatus.SENT.equals(current.getSignatureStatus())) {
+            return;
+        }
+
         current.setSignatureStatus(status);
     }
 
@@ -107,7 +119,12 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
     private void requestInspectionIfNeeded() {
 
         boolean isExpired = asset.getLastInspectionDate() == null ||
-                DAYS.between(asset.getLastInspectionDate(), Instant.ofEpochMilli(Workflow.currentTimeMillis())) > inspectionExpirationDays;
+                DAYS.between(asset.getLastInspectionDate(),
+                        Instant.ofEpochMilli(
+                                // Notice that here we get the Instant from the workflow (Workflow.currentTimeMillis())
+                                // instead of java.time.Instant because we want to prevent non-deterministic errors when
+                                // the workflow is replayed.
+                                Workflow.currentTimeMillis())) > inspectionExpirationDays;
 
         if (current.getInspectionStatus() != InspectionStatus.PENDING && !isExpired) {
             return;
