@@ -1,13 +1,12 @@
 package com.mahisoft.poc;
 
+import com.mahisoft.poc.crawler.CrawlerWorkflowImpl;
 import com.mahisoft.poc.crawler.activities.QueryActivityImpl;
 import com.mahisoft.poc.crawler.activities.RecordActivityImpl;
-import com.mahisoft.poc.crawler.CrawlerWorkflowImpl;
 import com.mahisoft.poc.publish.PublisherWorkflowImpl;
 import com.mahisoft.poc.publish.activities.assets.AssetActivityImpl;
 import com.mahisoft.poc.publish.activities.inspections.InspectionActivityImpl;
 import com.mahisoft.poc.publish.activities.media.MediaActivityImpl;
-import com.mahisoft.poc.publish.activities.signature.SignatureActivity;
 import com.mahisoft.poc.publish.activities.signature.SignatureActivityImpl;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;

@@ -46,6 +46,7 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
 
     @Override
     public void publish(PublicationState state) {
+        log.info("starting a publication process for asset id {}", state.getAssetId());
         this.current = state;
 
         // This hack ensures that if the inspectionExpirationDays value is changed, either in the code
@@ -95,8 +96,9 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
         }
 
         try {
-            current.setMediaStatus(MediaStatus.REQUESTED);
             media.requestNewPhotos(asset.getAddress());
+            current.setMediaStatus(MediaStatus.REQUESTED);
+            log.info("media request sent for asset {}", current.getAssetId());
         } catch (ActivityFailure ex) {
             current.setMediaStatus(MediaStatus.PENDING);
         }
@@ -112,10 +114,9 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
         }
 
         try {
+            inspection.requestInspection(asset.getAddress());
             current.setInspectionStatus(InspectionStatus.REQUESTED);
-            media.requestNewPhotos(asset.getAddress());
-
-            var t = Workflow.newTimer(Duration.ofDays(2));
+            log.info("inspection request sent for asset {}", current.getAssetId());
         } catch (ActivityFailure ex) {
             current.setInspectionStatus(InspectionStatus.PENDING);
         }
@@ -128,5 +129,6 @@ public class PublisherWorkflowImpl implements PublisherWorkflow {
 
         signature.sendSalesAgreement(asset);
         current.setSignatureStatus(SignatureStatus.SENT);
+        log.info("signature request sent for asset {}", current.getAssetId());
     }
 }
