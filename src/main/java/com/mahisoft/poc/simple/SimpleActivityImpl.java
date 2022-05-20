@@ -8,7 +8,7 @@ public class SimpleActivityImpl implements SimpleActivity {
 
     @Override
     public String callB(String value) {
-        return "B";
+        throw new RuntimeException("exception executing B");
     }
 
     @Override
