@@ -16,4 +16,9 @@ public class SimpleActivityImpl implements SimpleActivity {
     public String callC(String a, String b) {
         return "C";
     }
+
+    @Override
+    public String callD(String a, String b) {
+        return "D";
+    }
 }

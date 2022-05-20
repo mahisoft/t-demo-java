@@ -32,11 +32,19 @@ public class SimpleWorkflowImpl implements SimpleWorkflow {
         log.info("calling b");
         var b = simple.callB(a);
         state.put("b", b);
-        log.info("calling c");
-        var c = simple.callC(a, b);
-        state.put("c", c);
+        var version = Workflow.getVersion("callD", Workflow.DEFAULT_VERSION, 1);
+        String result;
+        if (version == Workflow.DEFAULT_VERSION) {
+            log.info("calling c");
+            result = simple.callC(a, b);
+            state.put("c", result);
+        } else {
+            log.info("calling d");
+            result = simple.callD(a, b);
+            state.put("d", result);
+        }
         log.info("done!!!");
-        return c;
+        return result;
     }
 
     @Override

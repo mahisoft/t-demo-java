@@ -15,4 +15,7 @@ public interface SimpleActivity {
     @ActivityMethod
     String callC(String a, String b);
 
+    @ActivityMethod
+    String callD(String a, String b);
+
 }
