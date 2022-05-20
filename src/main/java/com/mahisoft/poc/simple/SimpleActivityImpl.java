@@ -8,6 +8,7 @@ public class SimpleActivityImpl implements SimpleActivity {
 
     @Override
     public String callB(String value) {
+//        throw new RuntimeException("Any error");
         return "B";
     }
 
