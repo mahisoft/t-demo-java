@@ -8,6 +8,8 @@ import com.mahisoft.poc.publish.activities.assets.AssetActivityImpl;
 import com.mahisoft.poc.publish.activities.inspections.InspectionActivityImpl;
 import com.mahisoft.poc.publish.activities.media.MediaActivityImpl;
 import com.mahisoft.poc.publish.activities.signature.SignatureActivityImpl;
+import com.mahisoft.poc.simple.SimpleActivityImpl;
+import com.mahisoft.poc.simple.SimpleWorkflowImpl;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 import io.temporal.worker.WorkerFactory;
@@ -27,14 +29,18 @@ public class Worker {
         try {
             logger.info(String.format("Worker starting: PID %d", ProcessHandle.current().pid()));
             var worker = factory.newWorker(QUEUE_NAME);
-            worker.registerWorkflowImplementationTypes(CrawlerWorkflowImpl.class, PublisherWorkflowImpl.class);
+            worker.registerWorkflowImplementationTypes(
+                    CrawlerWorkflowImpl.class,
+                    PublisherWorkflowImpl.class,
+                    SimpleWorkflowImpl.class);
             worker.registerActivitiesImplementations(
                     new QueryActivityImpl(),
                     new RecordActivityImpl(),
                     new AssetActivityImpl(),
                     new InspectionActivityImpl(),
                     new MediaActivityImpl(),
-                    new SignatureActivityImpl());
+                    new SignatureActivityImpl(),
+                    new SimpleActivityImpl());
             factory.start();
             logger.info("Worker started");
         } catch (Exception ex) {

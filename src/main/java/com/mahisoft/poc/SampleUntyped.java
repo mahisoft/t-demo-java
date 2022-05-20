@@ -29,9 +29,10 @@ public class SampleUntyped {
         var execution = workflow.start(Map.of("assetId", "123456"));
 
         logger.info("Started workflow with id {}", execution.getWorkflowId());
-
+        Thread.sleep(3000);
         workflow.signal("updateMedia", "PROCESSED");
         workflow.signal("updateInspection", "DONE");
+        Thread.sleep(3000);
         workflow.signal("updateSalesAgreement", "SIGNED");
     }
 }
