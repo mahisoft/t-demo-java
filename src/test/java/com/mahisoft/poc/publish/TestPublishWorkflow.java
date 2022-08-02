@@ -15,6 +15,7 @@ import io.temporal.client.WorkflowOptions;
 import io.temporal.testing.TestWorkflowRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import java.time.Duration;
 
@@ -64,22 +65,50 @@ public class TestPublishWorkflow {
 
         PublisherWorkflow workflow = testWorkflowRule.getWorkflowClient().newWorkflowStub(PublisherWorkflow.class, options);
 
-        testWorkflowRule.getTestEnvironment().registerDelayedCallback(Duration.ofSeconds(1), () -> {
-            workflow.updateMedia(MediaStatus.PROCESSED);
-            workflow.updateInspection(InspectionStatus.DONE);
-        });
 
-        testWorkflowRule.getTestEnvironment().registerDelayedCallback(Duration.ofSeconds(2), () -> {
-            workflow.updateSalesAgreement(SignatureStatus.SIGNED);
-        });
 
-        workflow.publish(PublicationState.builder().assetId("123").build());
+        // We start the workflow using the WorkflowClient instead of executing workflow.publish(...)
+        // to avoid workflow timeout.
+        // This workflow implementation stays waiting for signals and only ends its execution after
+        // the exit condition is true "Workflow.await(() -> current.isDone() || current.isPublicationCanceled());"
+        // In order to use the workflow.publish(...) approach, all necessary registerDelayedCallback(...) must be registered
+        // previous calling the publish(...) method.
+        WorkflowClient.start(workflow::publish, PublicationState.builder().assetId("123").build());
+
+        // This first delay ensure the activities are called
+        testWorkflowRule.getTestEnvironment().sleep(Duration.ofSeconds(1));
+
+        var state = workflow.getState();
+        Assertions.assertEquals(MediaStatus.REQUESTED, state.getMediaStatus());
+        Assertions.assertFalse(state.isDone());
+
+        workflow.updateMedia(MediaStatus.PROCESSED);
+        state = workflow.getState();
+        Assertions.assertEquals(MediaStatus.PROCESSED, state.getMediaStatus());
+
+
+        workflow.updateInspection(InspectionStatus.DONE);
+        state = workflow.getState();
+        Assertions.assertTrue(state.isReadyForSignature());
+        Assertions.assertFalse(state.isDone());
+
+        workflow.updateSalesAgreement(SignatureStatus.SENT);
+        state = workflow.getState();
+        Assertions.assertEquals(SignatureStatus.SENT, state.getSignatureStatus());
+        Assertions.assertFalse(state.isDone());
+
+
+        workflow.updateSalesAgreement(SignatureStatus.SIGNED);
+        state = workflow.getState();
+        Assertions.assertTrue(state.isDone());
+
 
         verify(assetActivity, times(1)).getAsset(any());
         verify(inspectionActivity, times(1)).requestInspection(any());
         verify(mediaActivity, times(1)).requestNewPhotos(any());
         verify(signatureActivity, times(1)).sendSalesAgreement(any());
 
+        testWorkflowRule.getTestEnvironment().shutdown();
 
     }
 }
